@@ -20,19 +20,19 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="1. observer:start()官方系统监视工具，最强最全，但只能在window下运行，可惜正式部署环境大多为Linux，且不与外界节点联通，导致只能在开发周期使用        2. crashdump_viewer:start()官方对崩溃日志（erl_crash.dump）的解析工具        3. observer_cli:start()文字窗口版本的observer">
+  <meta name="description" content="erlang trace机制提供了一套消息发送接收、函数调用、垃圾收集、端口开闭的追踪方法 现在Erlang用于Trace的库有：  sys 是一个标准的OTP， 可以允许自 定义trace函数， 记录所有类型的事件等等。 它非常完善且可以很好地用于开发。 但它会稍微影响处于生产 环境的系统， 因为它没有把IO重定向到远程的shell中， 而且他没有限制trace消息的速度。 不过还是推荐阅读其文">
 <meta property="og:type" content="article">
-<meta property="og:title" content="erlang工具介绍">
-<meta property="og:url" content="http://example.com/2022/03/13/erlang%E5%B7%A5%E5%85%B7%E4%BB%8B%E7%BB%8D/index.html">
+<meta property="og:title" content="erlang trace 了解">
+<meta property="og:url" content="http://example.com/2022/04/13/erlang%20trace%E4%BA%86%E8%A7%A3/index.html">
 <meta property="og:site_name" content="欣然的备忘录">
-<meta property="og:description" content="1. observer:start()官方系统监视工具，最强最全，但只能在window下运行，可惜正式部署环境大多为Linux，且不与外界节点联通，导致只能在开发周期使用        2. crashdump_viewer:start()官方对崩溃日志（erl_crash.dump）的解析工具        3. observer_cli:start()文字窗口版本的observer">
+<meta property="og:description" content="erlang trace机制提供了一套消息发送接收、函数调用、垃圾收集、端口开闭的追踪方法 现在Erlang用于Trace的库有：  sys 是一个标准的OTP， 可以允许自 定义trace函数， 记录所有类型的事件等等。 它非常完善且可以很好地用于开发。 但它会稍微影响处于生产 环境的系统， 因为它没有把IO重定向到远程的shell中， 而且他没有限制trace消息的速度。 不过还是推荐阅读其文">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-03-13T07:06:47.000Z">
-<meta property="article:modified_time" content="2022-04-13T07:45:58.613Z">
+<meta property="article:published_time" content="2022-04-13T08:15:25.000Z">
+<meta property="article:modified_time" content="2022-04-13T08:18:38.012Z">
 <meta property="article:author" content="欣然">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/2022/03/13/erlang%E5%B7%A5%E5%85%B7%E4%BB%8B%E7%BB%8D/">
+<link rel="canonical" href="http://example.com/2022/04/13/erlang%20trace%E4%BA%86%E8%A7%A3/">
 
 
 <script id="page-configurations">
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>erlang工具介绍 | 欣然的备忘录</title>
+  <title>erlang trace 了解 | 欣然的备忘录</title>
   
 
 
@@ -160,7 +160,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/13/erlang%E5%B7%A5%E5%85%B7%E4%BB%8B%E7%BB%8D/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/13/erlang%20trace%E4%BA%86%E8%A7%A3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -173,7 +173,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          erlang工具介绍
+          erlang trace 了解
         </h1>
 
         <div class="post-meta">
@@ -182,16 +182,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2022-03-13 15:06:47" itemprop="dateCreated datePublished" datetime="2022-03-13T15:06:47+08:00">2022-03-13</time>
+              <time title="创建时间：2022-04-13 16:15:25 / 修改时间：16:18:38" itemprop="dateCreated datePublished" datetime="2022-04-13T16:15:25+08:00">2022-04-13</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-13 15:45:58" itemprop="dateModified" datetime="2022-04-13T15:45:58+08:00">2022-04-13</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -213,42 +207,16 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h4 id="1-observer-start"><a href="#1-observer-start" class="headerlink" title="1. observer:start()"></a>1. observer:start()</h4><p>官方系统监视工具，最强最全，但只能在window下运行，可惜正式部署环境大多为Linux，且不与外界节点联通，导致只能在开发周期使用       </p>
-<h4 id="2-crashdump-viewer-start"><a href="#2-crashdump-viewer-start" class="headerlink" title="2. crashdump_viewer:start()"></a>2. crashdump_viewer:start()</h4><p>官方对崩溃日志（erl_crash.dump）的解析工具       </p>
-<h4 id="3-observer-cli-start"><a href="#3-observer-cli-start" class="headerlink" title="3. observer_cli:start()"></a>3. observer_cli:start()</h4><p>文字窗口版本的observer       </p>
-<h4 id="4-erlangpl"><a href="#4-erlangpl" class="headerlink" title="4.  erlangpl"></a>4.  erlangpl</h4><p>escript ./erlangpl -n Node -c Cookie                </p>
-<p>网页版系统信息监控，需要能联通监视节点        </p>
-<p><a target="_blank" rel="noopener" href="https://github.com/erlanglab/erlangpl">项目地址</a></p>
-<h4 id="5-debugger"><a href="#5-debugger" class="headerlink" title="5. debugger"></a>5. debugger</h4><p>debugger:start().</p>
+        <p>erlang trace机制提供了一套消息发送接收、函数调用、垃圾收集、端口开闭的追踪方法</p>
+<p>现在Erlang用于Trace的库有：</p>
 <ul>
-<li>win下界面版断点调试、信息匹配跟踪                </li>
-<li>断点单进程比较合适，多进程并发服务器就不怎么适用了                </li>
-<li>信息匹配追踪，较难上手，比较适合通过命令方式在正式场景动态追踪问题        </li>
+<li>sys 是一个标准的OTP， 可以允许自 定义trace函数， 记录所有类型的事件等等。 它非常完善且可以很好地用于开发。 但它会稍微影响处于生产 环境的系统， 因为它没有把IO重定向到远程的shell中， 而且他没有限制trace消息的速度。 不过还是推荐阅读其文档模块。</li>
+<li>dbg 也是一个标准的OTP。 它的接口在可用性方面显得有点笨拙。 但它完全足以满足你所需。 问 题在于： 你必须要知道你要做什么,因为 dbg可以记录一切， 并在2秒内把系统搞崩溃。</li>
+<li>tracing BIFs作为一个Erang的模块可用。 它们大多作为原始块(the raw blocks)由这个列表中提到的application所调用,但由于他们处于较底层， 比较抽象， 用起来也非常困难。</li>
+<li>redbug 是可以在正式的生产 运行系统中使用的trace库， 是eper 的一部分， 它内部有一个速度限制开关， 和一个不错的可用接口。 为了使用它， 你必须把eper的所有依赖项都加上。 这个工具箱非常全面， 你会体验到一次非常有趣的安装。</li>
+<li>recon_trace 是recon中负 责trace的模块。 目的是和redbug有相同的安全水平,但却不要这么多的依赖项。 接口也不一样， 速度限制选项并不完全相同。 它可以只trace指定的函数调用， 没有trace send/recv message （实际在使用OTP的application里面根本没有必要支持trace message这种机制）</li>
 </ul>
-<h4 id="6-dialyzer"><a href="#6-dialyzer" class="headerlink" title="6. dialyzer"></a>6. dialyzer</h4><p>静态分析工具，代码错误检查鸡肋工具，会有较多的非错误性输出        </p>
-<h4 id="7-reltool"><a href="#7-reltool" class="headerlink" title="7. reltool"></a>7. reltool</h4><p>todo 发布工具        </p>
-<h4 id="8-运行时工具"><a href="#8-运行时工具" class="headerlink" title="8. 运行时工具"></a>8. 运行时工具</h4><ol>
-<li>dbg<br> todo 信息追踪                </li>
-<li>dyntrace<br>  todo 信息追踪</li>
-<li>erts_alloc_config<pre><code> 内存分配配置
-</code></pre>
-</li>
-<li>msacc<pre><code> 调度\IO进程利用率查看
-</code></pre>
-</li>
-<li>scheduler<pre><code> 调度进程
-</code></pre>
-</li>
-<li>system_infomation<pre><code> 系统信息
-</code></pre>
-</li>
-</ol>
-<h4 id="9-Syntax-Tool-标签工具"><a href="#9-Syntax-Tool-标签工具" class="headerlink" title="9. Syntax_Tool  标签工具"></a>9. Syntax_Tool  标签工具</h4><ol>
-<li>prettypr<br> 输出美化</li>
-</ol>
-<h4 id="10-cover-覆盖分析"><a href="#10-cover-覆盖分析" class="headerlink" title="10. cover 覆盖分析"></a>10. cover 覆盖分析</h4><figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">% 启动引用</span></span><br><span class="line">cover:start().</span><br><span class="line"><span class="comment">% 编译所要分析的模块</span></span><br><span class="line">cover:compile_beam(Module).</span><br><span class="line"><span class="comment">% 执行测试代码</span></span><br><span class="line"><span class="comment">% 覆盖分析</span></span><br><span class="line">cover:analyse(Module, coverrage, module | funcation | clause | line) -&gt; &#123;ok,  list()&#125;</span><br><span class="line"><span class="comment">% 调用次数分析</span></span><br><span class="line">cover:analyse(Module, calls, module | funcation | clause | line) -&gt; &#123;ok,  list()&#125;</span><br><span class="line"><span class="comment">% 输出到文件</span></span><br><span class="line">cover:analyse_to_file(Module).</span><br></pre></td></tr></table></figure>
-
-<h4 id="11-redbug"><a href="#11-redbug" class="headerlink" title="11. redbug"></a>11. redbug</h4><p><a target="_blank" rel="noopener" href="https://github.com/massemanet/redbug">项目地址</a></p>
+<h4 id="1-redbug的使用"><a href="#1-redbug的使用" class="headerlink" title="1. redbug的使用"></a>1. redbug的使用</h4><p><a target="_blank" rel="noopener" href="https://github.com/massemanet/redbug">项目地址</a></p>
 <p>基于erlang trace机制实现的，跟踪函数调用并输出的方法库</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">% 监听模块函数</span><br><span class="line">redbug:start(&quot;Module:Func&quot;).</span><br><span class="line">% 监听模块函数并打印结果 </span><br><span class="line">redbug:start(&quot;Module:Func-&gt;return&quot;).</span><br><span class="line">% 监听模块函数并打印调用堆栈</span><br><span class="line">redbug:start(&quot;Module:Func-&gt;stack&quot;).</span><br><span class="line"></span><br><span class="line">监听格式 &lt;MFA&gt; when &lt;guard&gt; -&gt; &lt;action&gt;</span><br><span class="line">MFA = Mod | Mod:Fun | Mod:Fun/Arity | Mod:Fun(_, atom, X)</span><br><span class="line">guard = is_atom(X) | X == 1</span><br><span class="line">action = return | stack | return;stack</span><br></pre></td></tr></table></figure>
 
@@ -307,7 +275,7 @@
 <td>true:显示参数个数 false:显示参数详细</td>
 </tr>
 </tbody></table>
-<h4 id="recon"><a href="#recon" class="headerlink" title="recon"></a>recon</h4><h5 id="recon-trace"><a href="#recon-trace" class="headerlink" title="recon_trace"></a>recon_trace</h5><p>以安全的方式监听单个erlang节点的函数调用，会创建一个进程去收集信息并处理</p>
+<h4 id="2-recon-trace的使用"><a href="#2-recon-trace的使用" class="headerlink" title="2. recon_trace的使用"></a>2. recon_trace的使用</h4><p>以安全的方式监听单个erlang节点的函数调用，会创建一个进程去收集信息并处理</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">recon_trace:calls(TSpecs::tspec() | [tspec(), ...], Max::max(), Opts::options()) -&gt; num_matches()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">recon_trace:call(&#123;dev, online, &#x27;_&#x27;&#125;, 100, []).</span><br><span class="line">% 带返回结果</span><br><span class="line">recon_trace:call(&#123;dev, online,  return_trace&#125;, 100, []).</span><br><span class="line">% 自定义输出打印 A = &#123;trace, Pid, call, &#123;M, F, A&#125;&#125;</span><br><span class="line">recon_trace:call(&#123;dev, online, &#x27;_&#x27;&#125;, 100, [&#123;formatter, fun(A)-&gt; io_lib:format(&quot;&quot;, [A]) end&#125;]).</span><br></pre></td></tr></table></figure>
 
 <table>
@@ -323,27 +291,29 @@
 <td>global</td>
 <td>local:跟踪包括本地调用 global:只限mfa的调用</td>
 </tr>
+<tr>
+<td>formatter</td>
+<td>recon_trace:format/1</td>
+<td>自定义消息打印格式</td>
+</tr>
+<tr>
+<td>pid</td>
+<td>all</td>
+<td>指定监听的进程，all=所有 new=开始监听后创建的</td>
+</tr>
+<tr>
+<td>io_server</td>
+<td>“”</td>
+<td>指定输出的文件，为空时则为当前的shell</td>
+</tr>
+<tr>
+<td>args</td>
+<td>args</td>
+<td>args=显示详细参数 arity=显示参数个数</td>
+</tr>
 </tbody></table>
 <p><a target="_blank" rel="noopener" href="http://ferd.github.io/recon/recon_trace.html#type-args">文档</a></p>
-<h4 id="12-Tool"><a href="#12-Tool" class="headerlink" title="12. Tool"></a>12. Tool</h4><h5 id="tags"><a href="#tags" class="headerlink" title="tags"></a>tags</h5><p>标签，用于生成EMACS的跳转函数，几乎不用，ctags就能支持了，且有更多适合erlang编辑的工具，如eclipse，Idea</p>
-<h5 id="cprof"><a href="#cprof" class="headerlink" title="cprof"></a>cprof</h5><p>一个基于断点的调用次数分析工具，使用时性能相对会下降10%</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">% 使用流程</span><br><span class="line">cprof:start().          % 开始统计</span><br><span class="line">cprof:pause().         % 暂停统计 </span><br><span class="line">cprof:analyse().       % 分析并打印结果</span><br><span class="line">cprof:restart().        % 重新开启统计</span><br><span class="line">cprof:stop().           % 结束统计</span><br><span class="line">```     </span><br><span class="line">以上函数都支持0-3参数（analyse除外）</span><br><span class="line"> - 0参数 表示监听所有已加载的模块，除了eprof自身</span><br><span class="line"> - Mod 监听某个模块</span><br><span class="line"> - Mod, Fun 监听某个函数，无论是否有导出</span><br><span class="line"> - Mod, Fun, Arty</span><br><span class="line"></span><br><span class="line">分析输出数据：</span><br><span class="line">&#123;调用总次数, [&#123;Mod, 模块凑数, [&#123;&#123;Mod, Fun&#125;, 函数次数&#125;]&#125;]&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">##### eprof</span><br><span class="line">时间分析工具，基于trace监控指定进程（及其创建的进程）的函数时间消耗，会影响系统性能</span><br></pre></td></tr></table></figure>
-<p>% 使用流程<br>eprof:start().                                      % 启动分析进程<br>eprof:start_profiling(PidL).                     % 开始分析<br>eprof:stop_profiling().                         % 结束分析<br>eprof:log(FileName).                           % 分析结果输出到指定文件<br>eprof:analyze(procs | total [, Opt]).      % 分析输出结果<br>eprof:stop().                                    % 停止进程</p>
-<pre><code>
-- analyze
-    - procs 分析结果按进程分类
-    - total 分析结果汇总
-    - Opt = [&#123;filter, Filter&#125; | &#123;sort, Sort&#125;]
-        - Sort = time | calls | mfa 指定排序的列
-        
-分析输出数据：
-Mod:Fun/Arty  | 调用次数 | 占用百分比 | 总消耗时间 | 每次消耗时间
-    
-
-
-
-[erlang应用文档](https://www.erlang.org/doc/applications.html)
-</code></pre>
+<h4 id="3-用途"><a href="#3-用途" class="headerlink" title="3. 用途"></a>3. 用途</h4><p>线上环境加输出打印不易，可以用recon_trace做动态输出打印</p>
 
     </div>
 
@@ -358,10 +328,13 @@ Mod:Fun/Arty  | 调用次数 | 占用百分比 | 总消耗时间 | 每次消耗�
 
         
     <div class="post-nav">
-      <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/2022/04/13/hexo%E5%85%A5%E9%97%A8/" rel="next" title="hexo入门">
-      hexo入门 <i class="fa fa-chevron-right"></i>
+    <a href="/2022/04/13/hexo%E5%85%A5%E9%97%A8/" rel="prev" title="hexo入门">
+      <i class="fa fa-chevron-left"></i> hexo入门
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/04/13/linux%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4/" rel="next" title="linux常用指令">
+      linux常用指令 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -421,7 +394,7 @@ Mod:Fun/Arty  | 调用次数 | 占用百分比 | 总消耗时间 | 每次消耗�
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-observer-start"><span class="nav-number">1.</span> <span class="nav-text">1. observer:start()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-crashdump-viewer-start"><span class="nav-number">2.</span> <span class="nav-text">2. crashdump_viewer:start()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-observer-cli-start"><span class="nav-number">3.</span> <span class="nav-text">3. observer_cli:start()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-erlangpl"><span class="nav-number">4.</span> <span class="nav-text">4.  erlangpl</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-debugger"><span class="nav-number">5.</span> <span class="nav-text">5. debugger</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-dialyzer"><span class="nav-number">6.</span> <span class="nav-text">6. dialyzer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-reltool"><span class="nav-number">7.</span> <span class="nav-text">7. reltool</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-%E8%BF%90%E8%A1%8C%E6%97%B6%E5%B7%A5%E5%85%B7"><span class="nav-number">8.</span> <span class="nav-text">8. 运行时工具</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-Syntax-Tool-%E6%A0%87%E7%AD%BE%E5%B7%A5%E5%85%B7"><span class="nav-number">9.</span> <span class="nav-text">9. Syntax_Tool  标签工具</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#10-cover-%E8%A6%86%E7%9B%96%E5%88%86%E6%9E%90"><span class="nav-number">10.</span> <span class="nav-text">10. cover 覆盖分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#11-redbug"><span class="nav-number">11.</span> <span class="nav-text">11. redbug</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#recon"><span class="nav-number">12.</span> <span class="nav-text">recon</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#recon-trace"><span class="nav-number">12.1.</span> <span class="nav-text">recon_trace</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#12-Tool"><span class="nav-number">13.</span> <span class="nav-text">12. Tool</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#tags"><span class="nav-number">13.1.</span> <span class="nav-text">tags</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#cprof"><span class="nav-number">13.2.</span> <span class="nav-text">cprof</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-redbug%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">1. redbug的使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-recon-trace%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">2. recon_trace的使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E7%94%A8%E9%80%94"><span class="nav-number">3.</span> <span class="nav-text">3. 用途</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
